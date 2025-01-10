@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "bitp"
+version = "0.1.0"
+description = ""
+authors = ["GeorgVetterGit <georg.vetter@tu-dortmund.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
