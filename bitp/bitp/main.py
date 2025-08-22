@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 import random
+import asyncio
 
 #TODO: Hindernisse einbauen
 #TODO: Boids dürfen sich nicht überlagern
@@ -309,72 +310,78 @@ swarm_list, bully_list = init_population(swarm_list, bully_list)
 menu_overlay = menu([all_sprites, menue])
 
 running = True
-while running:
-    clock.tick(60)
+async def main():
+    global running, swarm_list, bully_list, menu_overlay, PARAMETERS, all_sprites, bully_group, menue, swarm, IMG_GRASS, IMG_KID
+    while running:
+        clock.tick(60)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type ==pygame.MOUSEBUTTONDOWN:
-            if pygame.mouse.get_pressed(3)[0]:
-                click_pos = pygame.mouse.get_pos()
-                for idx, arrow in enumerate(menu_overlay.legend.values()):
-                    if pygame.rect.Rect(arrow).collidepoint(click_pos):
-                        change_up = False if idx % 2 == 0 else True
-                        flock_param = False if idx < 10 else True
-                        PARAMETERS[list(PARAMETERS.keys())[idx // 2]] += ((1 - change_up) * (-1) + change_up) * (1 - (0.9 * flock_param))
-                        if flock_param:
-                            PARAMETERS[list(PARAMETERS.keys())[idx // 2]] = max(round(PARAMETERS[list(PARAMETERS.keys())[idx // 2]],1),0.0)
-                        else:
-                            PARAMETERS[list(PARAMETERS.keys())[idx // 2]] = max(int(PARAMETERS[list(PARAMETERS.keys())[idx // 2]]),1)
-                if menu_overlay.reset_rect.collidepoint(click_pos):
-                    PARAMETERS = init_params()
-                if menu_overlay.restart_rect.collidepoint(click_pos):
-                    PARAMETERS = init_params()
-                    swarm_list, bully_list = init_population(swarm_list, bully_list)
-                    menu_overlay.die()
-                    menu_overlay = menu([all_sprites, menue])
-    
-    if len(bully_list) < PARAMETERS['Num Bullies']:
-        bully_list.append(bully([bully_group, all_sprites]))
-    elif len(bully_list) > PARAMETERS['Num Bullies']:
-        bully_list[0].die()
-        bully_list.pop(0)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type ==pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed(3)[0]:
+                    click_pos = pygame.mouse.get_pos()
+                    for idx, arrow in enumerate(menu_overlay.legend.values()):
+                        if pygame.rect.Rect(arrow).collidepoint(click_pos):
+                            change_up = False if idx % 2 == 0 else True
+                            flock_param = False if idx < 10 else True
+                            PARAMETERS[list(PARAMETERS.keys())[idx // 2]] += ((1 - change_up) * (-1) + change_up) * (1 - (0.9 * flock_param))
+                            if flock_param:
+                                PARAMETERS[list(PARAMETERS.keys())[idx // 2]] = max(round(PARAMETERS[list(PARAMETERS.keys())[idx // 2]],1),0.0)
+                            else:
+                                PARAMETERS[list(PARAMETERS.keys())[idx // 2]] = max(int(PARAMETERS[list(PARAMETERS.keys())[idx // 2]]),1)
+                    if menu_overlay.reset_rect.collidepoint(click_pos):
+                        PARAMETERS = init_params()
+                    if menu_overlay.restart_rect.collidepoint(click_pos):
+                        PARAMETERS = init_params()
+                        swarm_list, bully_list = init_population(swarm_list, bully_list)
+                        menu_overlay.die()
+                        menu_overlay = menu([all_sprites, menue])
         
-    screen.fill(COLORS['WHITE'])
-    screen.blit(IMG_GRASS,(0,0))
+        if len(bully_list) < PARAMETERS['Num Bullies']:
+            bully_list.append(bully([bully_group, all_sprites]))
+        elif len(bully_list) > PARAMETERS['Num Bullies']:
+            bully_list[0].die()
+            bully_list.pop(0)
+            
+        screen.fill(COLORS['WHITE'])
+        screen.blit(IMG_GRASS,(0,0))
 
-    bully_group.update(swarm_list)
+        bully_group.update(swarm_list)
 
-    new_swarm_list = []
+        new_swarm_list = []
+        
+        for boid in swarm_list:
+            save = True
+            min_dist_bull = np.random.choice(list(range(len(bully_list))))
+            for idx, bull in enumerate(bully_list):
+                if boid.position.distance_to(bull.pos) < boid.position.distance_to(bully_list[min_dist_bull].pos):
+                    min_dist_bull = idx
+                if boid.position.distance_to(bull.pos) <= 10:
+                    save = False
+                    bull.count_up()
+            if save:
+                new_swarm_list.append(boid)
+                boid.flock(swarm_list, bully_list[min_dist_bull].pos)
+            else:
+                boid.die()
+        swarm_list = new_swarm_list
+        
+        swarm.update()
+        menu_overlay.update()
+
+        swarm.draw(screen)
+        bully_group.draw(screen)
+        menue.draw(screen)
+        
+        font = pygame.font.SysFont(None, 24)
+        boid_count_text = font.render(f"Boids: {len(swarm_list)}", True, COLORS['BLACK'])
+        screen.blit(boid_count_text, (10, 10))
+
+        pygame.display.update()
+
+        await asyncio.sleep(0)  # Let other tasks run
     
-    for boid in swarm_list:
-        save = True
-        min_dist_bull = np.random.choice(list(range(len(bully_list))))
-        for idx, bull in enumerate(bully_list):
-            if boid.position.distance_to(bull.pos) < boid.position.distance_to(bully_list[min_dist_bull].pos):
-                min_dist_bull = idx
-            if boid.position.distance_to(bull.pos) <= 10:
-                save = False
-                bull.count_up()
-        if save:
-            new_swarm_list.append(boid)
-            boid.flock(swarm_list, bully_list[min_dist_bull].pos)
-        else:
-            boid.die()
-    swarm_list = new_swarm_list
-    
-    swarm.update()
-    menu_overlay.update()
+    #pygame.quit()
 
-    swarm.draw(screen)
-    bully_group.draw(screen)
-    menue.draw(screen)
-    
-    font = pygame.font.SysFont(None, 24)
-    boid_count_text = font.render(f"Boids: {len(swarm_list)}", True, COLORS['BLACK'])
-    screen.blit(boid_count_text, (10, 10))
-
-    pygame.display.update()
-
-pygame.quit()
+asyncio.run(main())
