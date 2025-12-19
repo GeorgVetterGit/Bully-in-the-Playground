@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Report</title>
+  <meta name="description" content="Project Report." />
+  <style>
+    :root{
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#0f172a;line-height:1.45}
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+
+    .hero{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(2,6,23,0.08)}
+    .hero img{width:100%;height:320px;object-fit:cover;display:block}
+    .hero video{width:100%;height:320px;object-fit:cover;display:block}
+    .hero .overlay{position:absolute;left:0;right:0;bottom:0;padding:18px;background:linear-gradient(180deg,rgba(2,6,23,0) 0%, rgba(2,6,23,0.45) 55%, rgba(2,6,23,0.6) 100%);color:#fff}
+    .hero h1{margin:0;font-size:clamp(20px,3.6vw,30px)}
+    .meta{font-size:14px;opacity:.95;margin-top:6px}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:20px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}.hero img{height:220px}.hero video{height:220px}}
+
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(5,10,25,0.04)}
+    h2{margin:0 0 10px 0}
+    p{margin:0 0 12px 0;color:var(--muted)}
+    ul{margin:0 0 12px 20px;color:var(--muted)}
+
+    .screenshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+    .screenshots img{width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);object-fit:cover}
+
+    .sim-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media (max-width:520px){.sim-list{grid-template-columns:1fr}}
+    .sim{display:flex;gap:12px;align-items:center;padding:10px;border-radius:8px;border:1px solid #e6edf6}
+    .sim .thumb{width:64px;height:48px;background:linear-gradient(135deg,#eaf2ff,#ffffff);display:flex;align-items:center;justify-content:center;border-radius:6px;font-weight:600;color:var(--accent)}
+    .sim a{color:var(--accent);font-weight:600;text-decoration:none}
+    .sim small{display:block;color:var(--muted)}
+
+    .tags{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+    .tag{background:#e0e7ff;color:#1e40af;padding:4px 10px;border-radius:9999px;font-size:13px;font-weight:500}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:14px}
+
+    .links{margin-top:20px;display:flex;gap:12px}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;padding:18px;z-index:60}
+    .modal.open{display:flex}
+    .modal .frame{width:100%;max-width:980px;background:var(--card);border-radius:10px;overflow:hidden}
+    .modal .frame header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #eef2f7}
+    .modal iframe{width:100%;height:600px;border:0}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero" role="img" aria-label="Bannerbereich des Projekts">
+      <video autoplay loop muted playsinline poster="https://via.placeholder.com/1400x320.png?text=Video+Fallback" src="nqueens/assets/nqueens_ingame.mov"></video>
+      <div class="overlay">
+        <h1>Bully in the Playground Simulation</h1>
+        <div class="meta">Project Report</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <main>
+        <div class="card">
+          <h2>Motivation</h2>
+          <p>Why do birds flock, why do fish school, and how can such complex natural phenomena be reduced to a handful of simple rules? For the most of us, these kinds of systems are particularly exciting because they show how emergent behavior can arise from very local interactions. Instead of hard-coding global patterns, we set up a few simple rules and let the dynamics play out.</p>
+          <p>One playful but powerful example is the <strong>“Bully in the Playground"</strong> model. Imagine one bully chasing a group of kids across the schoolyard. The kids scatter, trying to stay safe, while at the same time clinging to the safety of the group. Out of this simple game of chase emerge movement patterns that look remarkably similar to flocking birds, schooling fish, or even crowd dynamics.</p>
+
+          <h2>The Model: “Bully in the Playground”</h2>
+          <p>The model sets the stage in a two-dimensional playground where one or more predators (the bullies) are released together with a group of prey (the kids). The predators move toward their closest target, while the prey attempt to get away from danger. But instead of fleeing in random directions, the <strong>kids exhibit swarm behavior</strong>. They try to stay close to their peers, align their movements, and avoid collisions.</p>
+          <p>This means that three of the famous <strong>Boids rules</strong>—alignment, cohesion, and separation—are already embedded in the simulation. By combining them with predator–prey dynamics, we get a system that is both simple to program and endlessly rich in the behavior it produces. What looks like coordinated strategy is actually nothing more than local interactions playing out again and again.</p>
+
+          <h2>Model Parameters</h2>
+          <p>What makes the model particularly interesting is that it is <strong>highly tunable</strong>. By adjusting the parameters, we can influence the swarm in very different ways and essentially create new “ecosystems.” The number and speed of the bullies determine how much pressure the swarm is under. If the predators are too fast, the group becomes fragmented; if they are slow, the prey may easily escape.</p>
+          <p>On the prey side, swarm speed, radius, and force influence how tightly the group holds together. Strong cohesion and high alignment lead to dense, almost military-like formations, while weak swarm forces or high separation values cause the group to scatter. The bully radius determines when predators begin to react, while avoidance introduces an explicit escape vector away from the threat. All these knobs give us a way to study how fragile or resilient collective behavior really is.</p>
+          
+          <div class="screenshots">
+            <img src="nqueens/assets/Bild1.png" alt="Projekt-Screenshot 1">
+          </div>
+
+          <h2>What to Observe</h2>
+          <p>As you play with the model, certain patterns will quickly stand out. When cohesion and alignment are strong, the <strong>prey form a compact swarm</strong> that can withstand external pressure surprisingly well. But if you weaken these forces or add too many bullies, the <strong>group splits into fragments</strong> and becomes much easier to attack.</p>
+          <p>Different predator speeds also lead to different dynamics. Fast predators tend to chase <strong>specific targets directly</strong>, while slower ones create a diffuse pressure that drives the swarm into strange, emergent formations. In some setups, the system even reaches a <strong>quasi-stable equilibrium</strong> where neither side “wins,” and the group continues to circle endlessly.</p>
+
+          <h2>Next Steps: Experiments & Extensions</h2>
+          <p>The base model is just the beginning. Adding multiple predators or making the prey <strong>heterogeneous in speed and behavior</strong> adds even more richness. <strong>Introducing obstacles or safe zones</strong> creates new strategies and failure modes. And from a data science perspective, it becomes especially interesting when you start quantifying the swarm: measuring compactness, average distances, capture times, or even using optimization to search the parameter space for surprising configurations.</p>
+
+          <h2>Conclusion</h2>
+          <p>The “Bully in the Playground” model shows how emergent behavior can arise from nothing more than local interactions. What looks like intelligent strategy is actually the product of simple rules applied over and over again. By experimenting with a live pygame demo, you can experience this phenomenon firsthand, tweaking parameters, watching new patterns emerge, and building intuition for how complex systems organize themselves.</p>
+          <p>In the end, this small simulation is more than just a game. It is a <strong>playPlayground</strong>, a way to explore the dynamics of collective behavior and to connect the dots between playful models, natural systems, and real-world applications.</p>
+
+          <div class="tags">
+            <span class="tag">Gamification</span>
+            <span class="tag">Boids</span>
+            <span class="tag">Simulation</span>
+          </div>
+
+          <div class="links">
+            <a class="btn ghost" href="https://github.com/GeorgVetterGit/N-Queens_2" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <h2>Try the Simulation Yourself</h2>
+          <p>Instead of just looking at code snippets, you can try the model interactively. I have created a <strong>pygame demo</strong> that lets you explore the dynamics in real time and adjust the parameters yourself.</p>
+          <p>Once you launch the demo, you can watch the swarm as it reacts to predators and reset or adjust the simulation with simple controls. This transforms the abstract concept of swarm rules into something visual, playful, and immediately intuitive.</p>
+
+          <div class="sim-list">
+            <article class="sim">
+              <div class="thumb"><img src="bitp/assets/grass.png" alt="Thumbnail Simulation A"></div>
+              <div>
+                <a href="#" data-src="https://georgvettergit.github.io/assets/bully_in_the_playground/simulation/index.html" class="open-sim">Bully in the Playground</a>
+                <small>Run the simulation and adjust the parameters</small>
+              </div>
+            </article>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      © 2025 Georg Vetter. All rights reserved.
+    </footer>
+  </div>
+
+  <div id="simModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="frame" role="document">
+      <header>
+        <strong id="simTitle">Cosmic Rewind</strong>
+        <div>
+          <button id="closeModal" class="btn ghost">Schließen</button>
+          <a id="openInTab" class="btn" href="#" target="_blank" rel="noopener">In neuem Tab öffnen</a>
+        </div>
+      </header>
+      <iframe id="simFrame" src="about:blank" title="Simulation-Vorschau"></iframe>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.open-sim').forEach(el=>{
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        const src = this.getAttribute('data-src');
+        if(!src){ window.open(this.href || '#','_blank'); return; }
+        const modal = document.getElementById('simModal');
+        const frame = document.getElementById('simFrame');
+        const title = document.getElementById('simTitle');
+        const openInTab = document.getElementById('openInTab');
+        title.textContent = this.textContent || 'Simulation';
+        frame.src = src;
+        openInTab.href = src;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+      })
+    })
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      const modal = document.getElementById('simModal');
+      const frame = document.getElementById('simFrame');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      frame.src = 'about:blank';
+    })
+    document.getElementById('simModal').addEventListener('click', (ev)=>{
+      if(ev.target.id === 'simModal') document.getElementById('closeModal').click();
+    })
+  </script>
+</body>
+</html>
